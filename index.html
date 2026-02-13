@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Go88 MD5 - Sòng Bạc Live</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; color: white; }
+        #main-container { width: 100vw; height: 100vh; background: radial-gradient(circle, #5e0000, #000); position: relative; display: flex; flex-direction: column; align-items: center; }
+
+        /* HEADER */
+        .header { width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; background: rgba(0,0,0,0.8); border-bottom: 2px solid #d4af37; color: gold; font-weight: bold; z-index: 10; font-size: 13px; }
+
+        /* HŨ XU */
+        #jackpot-container { position: absolute; top: 65px; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+        #jackpot-amount { color: #ffff00; font-size: 26px; font-weight: 900; text-shadow: 0 0 10px orange; font-family: monospace; }
+
+        /* BÀN CHƠI */
+        .table-area {
+            position: relative; width: 95%; height: 320px;
+            background: #700000; border: 5px solid #d4af37; border-radius: 160px;
+            margin-top: 85px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 35px; box-shadow: 0 0 50px #000, inset 0 0 40px #000;
+        }
+
+        #session-info { position: absolute; top: 15px; left: 60px; color: rgba(255, 215, 0, 0.7); font-size: 12px; font-weight: bold; }
+        #online-count { position: absolute; top: 15px; right: 60px; color: #00ff00; font-size: 12px; }
+
+        /* CỬA CƯỢC */
+        .bet-box { width: 115px; height: 115px; border-radius: 50%; border: 4px solid #d4af37; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #111; cursor: pointer; position: relative; }
+        .tai { border-color: #00f2ff; }
+        .xiu { border-color: #ff004c; }
+        .label { font-size: 30px; font-weight: 900; text-shadow: 0 0 5px #000; }
+        
+        /* TIỀN CỦA BOT & PLAYER */
+        .total-bet-all { font-size: 14px; color: gold; font-weight: bold; margin-bottom: 2px; }
+        .user-bet-status { position: absolute; bottom: -30px; color: yellow; font-size: 13px; font-weight: bold; width: 120px; text-align: center; }
+
+        /* ĐĨA & BÁT */
+        #plate {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 140px; height: 140px; background: #fff; border-radius: 50%; border: 8px solid #ccc;
+            display: flex; justify-content: center; align-items: center; z-index: 5;
+        }
+        .dice-group { display: flex; gap: 4px; }
+        .dice { width: 32px; height: 32px; background: white; border: 1px solid #999; border-radius: 5px; display: flex; justify-content: center; align-items: center; color: black; font-weight: bold; font-size: 20px; }
+
+        #bowl {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #444, #111); border-radius: 50%; border: 2px solid gold;
+            z-index: 6; display: flex; justify-content: center; align-items: center;
+            transition: transform 0.7s ease-in-out, opacity 0.5s;
+        }
+        #bowl.open { transform: translateY(-120px); opacity: 0; pointer-events: none; }
+
+        /* POPUP & TIMER */
+        #timer-box { position: absolute; top: -55px; left: 50%; transform: translateX(-50%); background: #000; border: 2px solid gold; border-radius: 10px; padding: 5px 20px; font-size: 22px; color: yellow; font-weight: bold; }
+        #bet-popup { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
+        .popup-content { background: #222; border: 2px solid gold; border-radius: 15px; padding: 20px; width: 260px; text-align: center; }
+        
+        .status-text { margin-top: 45px; font-size: 22px; font-weight: bold; color: gold; text-shadow: 0 0 10px #000; }
+        .btn-open { margin-top: 20px; padding: 12px 35px; background: linear-gradient(#ffd700, #b8860b); border-radius: 8px; font-weight: bold; display: none; color: #000; border: 1px solid white; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div id="main-container">
+    <div class="header">
+        <span>👤 ID: VIETSON_PRO</span>
+        <span id="balance">💰 100.000.000</span>
+    </div>
+
+    <div id="jackpot-container">
+        <span id="jackpot-amount">5.284.152.000</span>
+    </div>
+
+    <div class="table-area">
+        <div id="session-info">Phiên: #284152</div>
+        <div id="online-count">🟢 2.451</div>
+        <div id="timer-box">60</div>
+        
+        <div class="bet-box tai" onclick="openBetPopup('TÀI')">
+            <span class="total-bet-all" id="all-bet-tai">0</span>
+            <span class="label" style="color: #00f2ff;">TÀI</span>
+            <div class="user-bet-status">Bạn: <span id="my-bet-tai">0</span></div>
+        </div>
+
+        <div id="plate">
+            <div class="dice-group">
+                <div class="dice" id="d1">1</div>
+                <div class="dice" id="d2">1</div>
+                <div class="dice" id="d3">1</div>
+            </div>
+            <div id="bowl">
+                <span style="color: gold; font-size: 14px; font-weight: bold;">MD5</span>
+            </div>
+        </div>
+
+        <div class="bet-box xiu" onclick="openBetPopup('XỈU')">
+            <span class="total-bet-all" id="all-bet-xiu">0</span>
+            <span class="label" style="color: #ff004c;">XỈU</span>
+            <div class="user-bet-status">Bạn: <span id="my-bet-xiu">0</span></div>
+        </div>
+    </div>
+
+    <div class="status-text" id="status">VUI LÒNG ĐẶT CƯỢC</div>
+    <button id="btnOpen" class="btn-open" onclick="manualOpen()">MỞ BÁT</button>
+
+    <div id="bet-popup">
+        <div class="popup-content">
+            <h3 id="popup-title" style="color: gold; margin-bottom: 15px;">ĐẶT CƯỢC</h3>
+            <input type="number" id="bet-amount" value="100000" style="width: 100%; padding: 10px; margin-bottom: 15px; text-align: center; font-size: 18px;">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="closePopup()" style="flex:1; padding:10px; background:#555; color:white; border:none; border-radius:5px;">HỦY</button>
+                <button onclick="confirmBet()" style="flex:1; padding:10px; background:gold; color:black; font-weight:bold; border:none; border-radius:5px;">XÁC NHẬN</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let timeLeft = 60;
+    let balance = 100000000;
+    let jackpot = 5284152000;
+    let myBets = { "TÀI": 0, "XỈU": 0 };
+    let botBets = { "TÀI": 0, "XỈU": 0 };
+    let currentSession = 284152;
+    let gameState = "BETTING";
+
+    // BOT ĐẶT TIỀN (ẢO)
+    function runBots() {
+        if (gameState !== "BETTING") return;
+        // Mỗi giây bot đặt từ 1tr đến 50tr ngẫu nhiên
+        botBets["TÀI"] += Math.floor(Math.random() * 5000000) + 1000000;
+        botBets["XỈU"] += Math.floor(Math.random() * 5000000) + 1000000;
+        
+        document.getElementById('all-bet-tai').innerText = botBets["TÀI"].toLocaleString();
+        document.getElementById('all-bet-xiu').innerText = botBets["XỈU"].toLocaleString();
+        
+        // Nhảy số người online ảo
+        document.getElementById('online-count').innerText = "🟢 " + (2400 + Math.floor(Math.random()*200)).toLocaleString();
+    }
+    setInterval(runBots, 800);
+
+    // TĂNG HŨ
+    setInterval(() => {
+        jackpot += Math.floor(Math.random() * 20000);
+        document.getElementById('jackpot-amount').innerText = jackpot.toLocaleString();
+    }, 2000);
+
+    function startNewGame() {
+        gameState = "BETTING";
+        timeLeft = 60;
+        myBets = { "TÀI": 0, "XỈU": 0 };
+        botBets = { "TÀI": 0, "XỈU": 0 };
+        currentSession++;
+        
+        document.getElementById('session-info').innerText = "Phiên: #" + currentSession;
+        document.getElementById('my-bet-tai').innerText = "0";
+        document.getElementById('my-bet-xiu').innerText = "0";
+        document.getElementById('all-bet-tai').innerText = "0";
+        document.getElementById('all-bet-xiu').innerText = "0";
+        document.getElementById('bowl').classList.remove('open');
+        document.getElementById('btnOpen').style.display = "none";
+        document.getElementById('status').innerText = "VUI LÒNG ĐẶT CƯỢC";
+        
+        prepareResult();
+
+        let timer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer-box').innerText = timeLeft;
+            if (timeLeft <= 10) document.getElementById('timer-box').style.color = "red";
+            else document.getElementById('timer-box').style.color = "yellow";
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                startWaitPhase();
+            }
+        }, 1000);
+    }
+
+    function openBetPopup(side) {
+        if (gameState !== "BETTING") return;
+        currentBetSide = side;
+        document.getElementById('popup-title').innerText = "ĐẶT CƯỢC " + side;
+        document.getElementById('bet-popup').style.display = "flex";
+    }
+
+    function closePopup() { document.getElementById('bet-popup').style.display = "none"; }
+
+    function confirmBet() {
+        let amt = parseInt(document.getElementById('bet-amount').value);
+        if (amt > balance || amt <= 0) return alert("Tiền không hợp lệ!");
+        balance -= amt;
+        myBets[currentBetSide] += amt;
+        document.getElementById('balance').innerText = "💰 " + balance.toLocaleString();
+        document.getElementById('my-bet-' + currentBetSide.toLowerCase()).innerText = myBets[currentBetSide].toLocaleString();
+        closePopup();
+    }
+
+    function startWaitPhase() {
+        gameState = "WAITING";
+        document.getElementById('btnOpen').style.display = "block";
+        document.getElementById('status').innerText = "HẾT GIỜ! MỜI MỞ BÁT";
+        document.getElementById('timer-box').innerText = "5";
+        let wait = 5;
+        let waitTimer = setInterval(() => {
+            wait--;
+            document.getElementById('timer-box').innerText = wait;
+            if (wait <= 0) { clearInterval(waitTimer); if (gameState === "WAITING") manualOpen(); }
+        }, 1000);
+    }
+
+    function manualOpen() {
+        if (gameState !== "WAITING") return;
+        gameState = "RESULT";
+        document.getElementById('btnOpen').style.display = "none";
+        document.getElementById('bowl').classList.add('open');
+        
+        let d1 = parseInt(document.getElementById('d1').innerText);
+        let d2 = parseInt(document.getElementById('d2').innerText);
+        let d3 = parseInt(document.getElementById('d3').innerText);
+        let sum = d1 + d2 + d3;
+        let winSide = sum >= 11 ? "TÀI" : "XỈU";
+
+        if (myBets[winSide] > 0) {
+            let winAmt = myBets[winSide] * 1.98;
+            balance += winAmt;
+            document.getElementById('status').innerText = `CHÚC MỪNG! +${winAmt.toLocaleString()}`;
+            document.getElementById('status').style.color = "#00ff00";
+        } else {
+            document.getElementById('status').innerText = `KẾT QUẢ: ${winSide} (${sum})`;
+            document.getElementById('status').style.color = "white";
+        }
+        
+        document.getElementById('balance').innerText = "💰 " + balance.toLocaleString();
+        setTimeout(startNewGame, 5000);
+    }
+
+    function prepareResult() {
+        document.getElementById('d1').innerText = Math.floor(Math.random()*6)+1;
+        document.getElementById('d2').innerText = Math.floor(Math.random()*6)+1;
+        document.getElementById('d3').innerText = Math.floor(Math.random()*6)+1;
+    }
+
+    window.onload = startNewGame;
+</script>
+</body>
+</html>
